@@ -13,5 +13,8 @@
     "prod": "pm2 start index.js -i 0",
     "stop": "pm2 stop",
     "start": "nodemon index.js"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0"
   }
 }
