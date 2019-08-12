@@ -7,6 +7,7 @@ const chalk = require("chalk");
 Mongoose.connect("mongodb://localhost:27017/nabd",{useNewUrlParser:true});
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+app.use("/api",require("./routes/"));
 
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;
