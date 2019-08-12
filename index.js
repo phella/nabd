@@ -12,6 +12,7 @@ console.log("connected to database")
 );
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+app.use("/api",require("./routes/"));
 
 ///////////////////////////
 app.use('/account', account);
