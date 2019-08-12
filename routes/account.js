@@ -211,6 +211,11 @@ router.post('/resend_code', async (req,res)=> {
             flag =true;
             res.status(409).send({"Error":"phoneNo does not exist"});
         }
+        if(exist[0].isActivated == true)
+        {
+            flag =true;
+            res.status(409).send({"Error":"Account is already activated"});
+        }
     })
     if(flag == true)
         return;
