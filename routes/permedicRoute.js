@@ -19,6 +19,9 @@ const permedic = mongoose.model("permedic");
  */
 module.exports = router.get("/requestPermedic/:rating/:lastNumber", async (req,res) => {
 	let permedics;
+	if(req.rank < 0 || req.rank > 100){
+		res.status(400).json("Rank out of range");
+	}
 	// to do add better algorithm using ML if possible
 	await permedic.find({ $and: [ { rating: { $lt: +req.params.rating+30 } }, { rating: {$gt:+req.params.rating-5} } ] },"name",(err,data)=>{
 		permedics = data;
