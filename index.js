@@ -4,12 +4,15 @@ const express = require("express");
 const app = express();
 const chalk = require("chalk");
 
+
+
 let account = require('./routes/account');
 
- 
-Mongoose.connect("mongodb://localhost:27017/nabd",{useNewUrlParser:true},
-console.log("connected to database")
+console.log(process.env.DATABASECONNECTION);
+Mongoose.connect(process.env.DATABASECONNECTION,{useNewUrlParser:true},
+	console.log("connected to database")
 );
+
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use("/api",require("./routes/"));
