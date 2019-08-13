@@ -23,10 +23,18 @@ module.exports = router.get("/requestPermedic/:rating/:lastNumber", async (req,r
 	await permedic.find({ $and: [ { rating: { $lt: +req.params.rating+30 } }, { rating: {$gt:+req.params.rating-5} } ] },"name",(err,data)=>{
 		permedics = data;
 	}).limit(5);
+	if(permedics === []) {
+		await permedic.find({},"name",(err,data)=>{
+			permedics = data;
+			if(permedics === []) {
+				res.status(200).json("no available permedics at the moment");
+			}
+		});
+	}
 	permedics.sort((a, b) => (Math.abs(a.rating-req.rating) > Math.abs(b.rating-req.rating) ? 1 : -1));
 	if(permedics[0].number !== req.params.lastNumber){
-		res.json(permedics[0]);
+		res.status(200).json(permedics[0]);
 	} else {
-		res.json(permedics[1]);
+		res.status(200).json(permedics[1]);
 	}
 });
