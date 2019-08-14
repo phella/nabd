@@ -3,14 +3,13 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const chalk = require("chalk");
-
-
+require('dotenv').config();
 
 let account = require('./routes/account');
 
-console.log(process.env.DATABASECONNECTION);
+
 Mongoose.connect(process.env.DATABASECONNECTION,{useNewUrlParser:true},
-	console.log("connected to database")
+	console.log("Connected to database")
 );
 
 app.use(bodyParser.urlencoded({extended:true}));

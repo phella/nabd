@@ -1,7 +1,7 @@
 # dependencies
 /node_modules
 
-#SMS key
+#SMS/Database/Token key
 .env
 
 #documentation
