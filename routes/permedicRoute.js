@@ -22,17 +22,18 @@ module.exports = router.get("/requestPermedic/:rating/:lastNumber", async (req,r
 	if(req.rank < 0 || req.rank > 100){
 		res.status(400).json("Rank out of range");
 	}
+	
 	// to do add better algorithm using ML if possible
-	await permedic.find({ $and: [ { rating: { $lt: +req.params.rating+30 } }, { rating: {$gt:+req.params.rating-5} } ] },"name",(err,data)=>{
-		permedics = data;
-	}).limit(5);
+	permedics = await permedic.find({ $and: [ { rating: { $lt: +req.params.rating+30 } }, { rating: {$gt:+req.params.rating-5} } ] },"name")
+	.limit(5)
+	.exec();
+	
 	if(permedics === []) {
-		await permedic.find({},"name",(err,data)=>{
-			permedics = data;
-			if(permedics === []) {
-				res.status(200).json("no available permedics at the moment");
-			}
-		});
+		permedics = await permedic.find({},"name")
+		.exec();
+		if(permedics === []) {
+			res.status(200).json("no available permedics at the moment");
+		}
 	}
 	permedics.sort((a, b) => (Math.abs(a.rating-req.rating) > Math.abs(b.rating-req.rating) ? 1 : -1));
 	if(permedics[0].number !== req.params.lastNumber){
