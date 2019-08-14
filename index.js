@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const chalk = require("chalk");
 require('dotenv').config();
+require('./services/cache.service');
 
 
 app.use(require("./middlewares/authentication"));
