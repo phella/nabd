@@ -304,21 +304,10 @@ router.post('/login', async (req,res)=> {
 });
 
 
-function verifyToken(req,res,next){
-    // get auth header value
-    const header = req.headers['token'];
-    //check if bearer is undefined
-    if(typeof header === 'undefined'){
-        res.status(403).send({"Error":"unauthorized"});
-    }
-    else{
-        req.token = header;
-        next();
-    }
-}
 
 
-router.post('/test',verifyToken,(req,res)=>{
+
+router.post('/test',(req,res)=>{
     jwt.verify(req.token,process.env.SERCETKEY,(err,authData)=>{
         if(err){
             res.status(403).send({"Error":"unauthorized"});

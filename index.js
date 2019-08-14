@@ -5,6 +5,8 @@ const app = express();
 const chalk = require("chalk");
 require('dotenv').config();
 
+
+app.use(require("./middlewares/authentication"));
 let account = require('./routes/account');
 
 
