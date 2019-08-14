@@ -6,12 +6,12 @@ const util = require("util");
 const redisUrl = "redis://127.0.0.1:6379";
 
 const client = redis.createClient(redisUrl);
-client.get = util.promisify(client.hget);
+client.hget = util.promisify(client.hget);
 
 
 mongoose.Query.prototype.cache = function (options = {}) {
 	this.useCache = true;
-	this.hashKey = options.key || '';
+	this.hashKey = options.key || 'no key';
 	return this;
 }
 
@@ -22,13 +22,12 @@ mongoose.Query.prototype.cache = function (options = {}) {
 mongoose.Query.prototype.exec = async function () {
 	
 	// Query doesn't use cache
-	if(this.useCache !== undefined) {
+	if(this.useCache !== true) {
 		const result = await exec.apply(this,arguments);
 		return result;
 	}
 	const collectionName =  this.mongooseCollection.name;
 	const cacheValue = await client.hget(this.hashKey,collectionName);
-
 	// Query is cached
 	if(cacheValue){
 		const doc = JSON.parse(cacheValue);
