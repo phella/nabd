@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt =  require('bcrypt');
 const randomstring = require("randomstring");
-require('dotenv').config();
+const jwt = require('jsonwebtoken');
+var index = require('./index');
 
 // to send SMS
  const Nexmo = require('nexmo');
@@ -12,8 +13,6 @@ require('dotenv').config();
    apiSecret: process.env.APISECRET,
  });
 
-
-const {check, validationResult} = require('express-validator');
 
 let account = require('../models/account');
 let code = require('../models/code');
@@ -247,6 +246,92 @@ router.post('/resend_code', async (req,res)=> {
         }
     })
     res.status(201).send("Created Successfully");
+});
+
+
+async function checkpassword(password,hashedPassword) {
+    const match = await bcrypt.compare(password, hashedPassword);
+    return match;
+}
+
+router.post('/login', async (req,res)=> {
+    const phoneNo = req.body.phoneNo;
+    const password = req.body.password;
+    if(phoneNo == null || password == null)
+    {
+        res.status(400).send({"Error":"Payload is missing"});
+        return;
+    }
+    await credentials.find({phoneNo:phoneNo, isActivated:true}, (err, exist)=>{
+        if(err){
+            res.status(409).send(err);
+            return;
+        }
+        // if phoneNo and password along with activation does not match in database
+        if(exist.length == 0){
+            res.status(401).send({"Error":"phoneNo does not exist or is not activated"});
+            return;
+        }
+        // compare password with the hashed password in db
+        bcrypt.compare(password,exist[0].password,function(err,match){
+            if(err){
+                res.status(409).send(err);
+                return ;
+            }
+            console.log(match);
+            if(!match)
+            {
+                res.status(401).send({"Error":"Wrong password"});
+                return;
+            }
+        });
+    })
+    const user = {
+        phoneNo:phoneNo,
+        password:password
+    };
+    jwt.sign({user},process.env.SERCETKEY,{ expiresIn:'864000s'/**10days*/ },(err,token)=>{
+        if(err){       
+            res.status(409).send(err);
+            return;
+        }
+        else{
+            res.status(201).json({
+                token
+            });
+        }
+    })
+});
+
+
+function verifyToken(req,res,next){
+    // get auth header value
+    const header = req.headers['token'];
+    //check if bearer is undefined
+    if(typeof header === 'undefined'){
+        res.status(403).send({"Error":"unauthorized"});
+    }
+    else{
+        req.token = header;
+        next();
+    }
+}
+
+
+router.post('/test',verifyToken,(req,res)=>{
+    jwt.verify(req.token,process.env.SERCETKEY,(err,authData)=>{
+        if(err){
+            res.status(403).send({"Error":"unauthorized"});
+            return;
+        }
+         else{
+             res.status(201).json({
+                 message:'created!',
+                 authData
+             });
+            }
+                // write code here!
+    });
 });
 
 module.exports = router;
