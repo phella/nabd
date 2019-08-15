@@ -20,12 +20,14 @@
     "redis": "^2.8.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cross-env NODE_ENV=development mocha './**/*.spec.js'",
     "prod": "pm2 start index.js -i 0",
     "stop": "pm2 stop",
     "start": "nodemon index.js"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
     "eslint": "^6.1.0",
     "jsdoc": "^3.6.3"
   }
