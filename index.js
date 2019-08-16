@@ -25,6 +25,10 @@ app.use('/account', account);
 
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-	console.log(`Listening on ${chalk.green(port)}`);
-});
+if(!module.parent) {
+	app.listen(port, () => {
+		console.log(`Listening on ${chalk.green(port)}`);
+	});
+}
+
+module.exports = app;
