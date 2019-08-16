@@ -304,23 +304,4 @@ router.post('/login', async (req,res)=> {
 });
 
 
-
-
-
-router.post('/test',(req,res)=>{
-    jwt.verify(req.token,process.env.SERCETKEY,(err,authData)=>{
-        if(err){
-            res.status(403).send({"Error":"unauthorized"});
-            return;
-        }
-         else{
-             res.status(201).json({
-                 message:'created!',
-                 authData
-             });
-            }
-                // write code here!
-    });
-});
-
 module.exports = router;
