@@ -42,3 +42,18 @@ module.exports = router.get("/requestPermedic/:rating/:lastNumber", async (req,r
 		res.status(200).json(permedics[1]);
 	}
 });
+
+
+router.get("/profile/permedic/:number" , async (req,res)=>{
+	if(req.params.number.length !== 11 || req.params.number.substring(0,2) !== "01") {
+		res.status(400).json({"Error":"Wrong phone number format"});
+	}
+	const profile = await permedic.findOne({number:req.params.number},"bio name number gender profilePath available")
+	.cache({"key":req.params.number})
+	.exec();
+	if(!profile) {
+		res.status(404).json({"Error":"No such permedic"});
+	} else {
+		res.status(200).json(profile);
+	}
+});
