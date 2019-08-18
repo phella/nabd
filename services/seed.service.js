@@ -7,8 +7,6 @@ let tempTokens = [];
 
  function populatePermedics(permedics) {
 	permedic.deleteMany({},(err,result)=>{
-		console.log(err);
-		console.log(result);
 	});
 	permedics.forEach(element => {
 		jwt.sign({"phoneNo":element.number,"password":element.password},process.env.SERCETKEY,(err,token)=>{
