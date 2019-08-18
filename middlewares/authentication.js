@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 module.exports = function verifyToken(req,res,next){
     // get auth header value
     const token = req.headers['token'];
@@ -11,11 +12,10 @@ module.exports = function verifyToken(req,res,next){
                 return res.status(403).send({"Error":"unauthorized"});
             }
              else{
-                 console.log(authData);
                  req._id = authData.phoneNo;
+                 next();
                 }
         });
-        next();
     }
 }
 
