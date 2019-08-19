@@ -7,13 +7,13 @@ const bst2 = new bss();
 describe("test binary search tree",()=>{
 	it("constructor and insertion",()=>{
 		expect(bst.root).to.equal(null);
-		const first = {rating:20,number:"0120"};
-		const second = {rating:20,number:"011"};
-		const third = {rating:10,number:"0120"};
-		const forth = {rating:10,number : "012"};
-		const fifth = {rating:30,number:"0123"};
-		const sixth ={rating : 40,number:"00"};
-		const seventh = {rating:25,number:"01"};
+		const first = {rating:20,phoneNo:"0120"};
+		const second = {rating:20,phoneNo:"011"};
+		const third = {rating:10,phoneNo:"0120"};
+		const forth = {rating:10,phoneNo : "012"};
+		const fifth = {rating:30,phoneNo:"0123"};
+		const sixth ={rating : 40,phoneNo:"00"};
+		const seventh = {rating:25,phoneNo:"01"};
 		bst.insertPermedic(first);
 		expect(bst.root.data[0]).to.equal(first);
 		bst.insertPermedic(second);
@@ -34,15 +34,15 @@ describe("test binary search tree",()=>{
 		expect(bst2.getPermedic(20)).to.equal(false);
 		bst.getPermedic(20);
 		should.not.exist(bst.root.data[1]);
-		expect(bst.root.data[0].number).to.equal("011");
+		expect(bst.root.data[0].phoneNo).to.equal("011");
 		bst.getPermedic(20);
-		expect(bst.root.data[0].number).to.equal("01");
-		expect(bst.getPermedic(5).number).to.equal("012");
+		expect(bst.root.data[0].phoneNo).to.equal("01");
+		expect(bst.getPermedic(5).phoneNo).to.equal("012");
 		expect(bst.root.left).to.equal(null);
 		bst.getPermedic(30);
-		expect(bst.root.right.data[0].number).to.equal("00");
-		expect(bst.getPermedic(10).number).to.equal("01");
-		expect(bst.getPermedic(10).number).to.equal("00");
+		expect(bst.root.right.data[0].phoneNo).to.equal("00");
+		expect(bst.getPermedic(10).phoneNo).to.equal("01");
+		expect(bst.getPermedic(10).phoneNo).to.equal("00");
 		expect(bst.root).to.equal(null);
 	});
 })

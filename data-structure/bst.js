@@ -214,7 +214,7 @@ class BinarySearchTree {
         return close;
 	}
 	printTree(node){
-		console.log(node.data[0].number);
+		console.log(node.data[0].phoneNo);
 		if(node.left){
 			this.printTree(node.left);
 		} 
