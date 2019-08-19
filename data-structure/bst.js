@@ -1,14 +1,30 @@
 "use strict"
-const available = {};
+const redis = require("redis");
+const util = require("util");
+const redisUrl = "redis://127.0.0.1:6379";
+const client = redis.createClient(redisUrl);
+client.get = util.promisify(client.get);
+client.set("available","true");
+let available ; 
 class BinarySearchTree {
     constructor(){
         this.root = null;
-    }
-    insertPermedic(data , left = null,right = null ) {
-		if(available[data.number] !== undefined) {
-			return false;
-		}
-		available[data.number] = true;
+	}
+
+	insertPermedic(data,left=null,right=null){
+		let checkRedis = setTimeout(async()=>{
+			available =	await client.get("available");
+			if(available == true){
+				this.root = await client.get("root");
+				this.root = JSON.parse(root);
+				clearTimeout(checkRedis);
+				this.PrivateinsertPermedic(data,left,right);
+			}
+		},50);
+	}
+
+    PrivateinsertPermedic(data , left = null,right = null ) {
+		client.set("available","false");
 		let node = {
             data : [data],
             left,
@@ -16,6 +32,8 @@ class BinarySearchTree {
 		};
 		if(!this.root){
 			this.root = node;
+			client.set("root",JSON.stringify(this.root));
+			client.set("available","true");
 			return true;
 		}
 		let lastNode = this.root;
@@ -29,7 +47,9 @@ class BinarySearchTree {
 		}
         while(currentNode){
             if(currentNode.data[0].rating === data.rating) {
-                currentNode.data.push(data);
+				currentNode.data.push(data);
+				client.set("root",JSON.stringify(this.root));
+				client.set("available","true");
                 return true;
             } else if (currentNode.data[0].rating < data.rating) {
 				lastNode = currentNode;
@@ -44,10 +64,13 @@ class BinarySearchTree {
 		} else {
 			lastNode.left = node;
 		}
+		client.set("root",JSON.stringify(this.root));
+		client.set("available","true");
 		return true;
 	}
+
 	/**
-	 * 
+	 * get replacable node to current node
 	 * @param  node node to be replaced 
 	 * @param  last its parent
 	 * @param  rating request permedic rating
@@ -101,8 +124,25 @@ class BinarySearchTree {
 				}
 			} 
         }
-    }
-    getPermedic(rating){
+	}
+	
+	getPermedic(rating){
+		let promise = new promise(function(resolve,reject){
+		let checkRedis2 = setTimeout(async()=>{
+			available =	await client.get("available");
+			if(available == true){
+				this.root = await client.get("root");
+				this.root = JSON.parse(root);
+				clearTimeout(checkRedis2);
+				resolve(this.PrivategetPermedic(rating));
+				}
+			},50);
+		});
+		return promise
+	}
+
+    PrivategetPermedic(rating){
+		client.set("available","false");
 		let lastNode = this.root;
 		let currentNode;
         if(!this.root){
@@ -120,10 +160,12 @@ class BinarySearchTree {
             if(currentNode.data[0].rating === rating){
                 permedic = currentNode.data.shift();
                 if(currentNode.data.length !== 0){
-					// available.delete[permedic.number];
+					client.set("root",JSON.stringify(this.root));
+					client.set("available","true");
 					return permedic;
                 } else {
-					// avialable.delete
+					client.set("root",JSON.stringify(this.root));
+					client.set("available","true");
 					if(lastNode == currentNode){
 						this.findAlternative(currentNode,lastNode,"root");
 					}
@@ -132,7 +174,9 @@ class BinarySearchTree {
 					} else {
 						this.findAlternative(currentNode,lastNode,"left");
 					}
-					   return permedic;
+						client.set("root",JSON.stringify(this.root));
+						client.set("available","true");
+					    return permedic;
                 }
             } else if(currentNode.data[0].rating < rating){
 				if(currentNode.right){
@@ -165,7 +209,8 @@ class BinarySearchTree {
 				 this.findAlternative(currentNode,lastNode,"left");
 			 }
 		}
-		// available.delete[close.number];
+		client.set("root",JSON.stringify(this.root));
+		client.set("available","true");
         return close;
 	}
 	printTree(node){
