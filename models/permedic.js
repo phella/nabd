@@ -17,8 +17,7 @@ const permedicSchema = new Schema({
 	password: String,
 	gender: String,
 	number:String,
-	profilePath: String,
-	available: Boolean
+	profilePath: String
 });
 
 mongoose.model("permedic", permedicSchema);
