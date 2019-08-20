@@ -24,10 +24,12 @@ let credentials = require('../models/credentials');
 router.post('/register', function (req, res) { 
     const name = req.body.name;
     const phoneNo = req.body.phoneNo;
-    const age = Number(req.body.age);
+    const age = +req.body.age;
     const gender = req.body.gender;
     const password = req.body.password;
     const passwordCheck = req.body.passwordCheck;
+    // 0 : permedic & 1 : patient
+    const type = +req.body.type;
 
     //check if the number is valid
     if (isNaN(phoneNo) || phoneNo.length != 11 || (phoneNo.substring(0,3)!="010" &&phoneNo.substring(0,3) != "011" && phoneNo.substring(0,3) != "012") || phoneNo==null )
@@ -43,11 +45,14 @@ router.post('/register', function (req, res) {
     }
 
     //check if something is missing in the payload
-    if(name ==null || age == null || gender == null || password == null || passwordCheck == null)
+    if(name ==null || age == null || gender == null || password == null || passwordCheck == null || type == null)
     {
         res.status(400).send({"Error":"Payload is missing"});
         return;
     } 
+    if(type === 1 ){
+        
+    }
     // creating new document
     let newAccount = new account({
         name:name,
