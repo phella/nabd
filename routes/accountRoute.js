@@ -15,7 +15,7 @@ const nexmo = new Nexmo({
 
 
 let account = require('../models/account');
-const patient = require('../models/patient');
+let patient = require('../models/patient');
 let code = require('../models/code');
 let credentials = require('../models/credentials');
 
@@ -26,31 +26,25 @@ router.post('/register/patient', function (req, res) {
     const age = +req.body.age;
     const gender = req.body.gender;
     const password = req.body.password;
-    const passwordCheck = req.body.passwordCheck;
     // to do check if phone is already signed in
     //check if the number is valid
-    if (isNaN(phoneNo) || phoneNo.length != 11 || (phoneNo.substring(0, 3) != "010" && phoneNo.substring(0, 3) != "011" && phoneNo.substring(0, 3) != "012") || phoneNo == null) {
+    if (isNaN(+phoneNo) || phoneNo.length !== 11 || phoneNo.substring(0, 2) !== "01" || phoneNo === null) {
         res.status(400).send({ "Error": "Wrong phone number format" });
-        return;
-    }
-    //check if password match
-    if (password !== passwordCheck) {
-        res.status(409).send({ "Error": "Password does not match" });
         return;
     }
 
     //check if something is missing in the payload
-    if (name == null || age == null || gender == null || password == null || passwordCheck == null) {
+    if (name == null || age == null || gender == null || password == null) {
         res.status(400).send({ "Error": "Payload is missing" });
         return;
     }
-    let newAccount = new patient(
+    let newAccount = new patient({
         name,
         age,
         gender,
         password,
         phoneNo
-    );
+    });
     newAccount.save(function (err) {
         if (err) {
             res.status(409).send(err);
@@ -58,53 +52,13 @@ router.post('/register/patient', function (req, res) {
         else {
             let result = hashPasswords(newAccount);
             if(result === true){
-                activateAccount(req,res);
+                activateAccount(newAccount,res);
             } else {
                 return  res.status(409).json(result);
             }
         }
     });
 });
-// Register route
-router.post('/register', function (req, res) {
-    const name = req.body.name;
-    const phoneNo = req.body.phoneNo;
-    const age = +req.body.age;
-    const gender = req.body.gender;
-    const password = req.body.password;
-    const passwordCheck = req.body.passwordCheck;
-
-    //check if the number is valid
-    if (isNaN(phoneNo) || phoneNo.length != 11 || (phoneNo.substring(0, 3) != "010" && phoneNo.substring(0, 3) != "011" && phoneNo.substring(0, 3) != "012") || phoneNo == null) {
-        res.status(400).send({ "Error": "Wrong phone number format" });
-        return;
-    }
-    //check if password match
-    if (password !== passwordCheck) {
-        res.status(409).send({ "Error": "Password does not match" });
-        return;
-    }
-
-    //check if something is missing in the payload
-    if (name == null || age == null || gender == null || password == null || passwordCheck == null || type == null) {
-        res.status(400).send({ "Error": "Payload is missing" });
-        return;
-    }
-    // creating new document
-    let newAccount = new account({
-        name: name,
-        phoneNo: phoneNo,
-        password: password,
-        age: age,
-        gender: gender,
-    })
-
-    //hashing password before storing in db
-    const saltRounds = 10;
-
-});
-
-
 
 router.put('/confirmation', async (req, res) => {
     const phoneNo = req.body.phoneNo;
@@ -287,7 +241,9 @@ module.exports = router;
 
 function hashPasswords(newAccount) {
     let error;
-    bcrypt.hash(password, saltRounds, function (err, hash) {
+    //hashing password before storing in db
+    const saltRounds = 10;
+    bcrypt.hash(newAccount.password, saltRounds, function (err, hash) {
         newAccount.password = hash;
         if (err) {
             error = err;
@@ -300,7 +256,7 @@ function hashPasswords(newAccount) {
     }
 }
 
-function activateAccount(req,res) {
+function activateAccount(newAccount,res) {
     // generating random code for verification
     const randomCode = randomstring.generate(8);
     // storing code in database
@@ -308,7 +264,7 @@ function activateAccount(req,res) {
     thisMoment.setMinutes(thisMoment.getMinutes() + 5); // adding 5mins for date to expire
     let newCode = new code({
         code: randomCode,
-        phoneNo: phoneNo,
+        phoneNo:newAccount.phoneNo,
         expirationDate: thisMoment
     })
     newCode.save(function (err) {
@@ -324,7 +280,7 @@ function activateAccount(req,res) {
     })
     // creating new account but still not activated
     let newCredentials = new credentials({
-        phoneNo: phoneNo,
+        phoneNo:newAccount.phoneNo,
         password: newAccount.password,
         isActivated: false
     })
@@ -337,7 +293,7 @@ function activateAccount(req,res) {
         }
     })
     const from = 'Server';
-    const to = '2' + phoneNo;
+    const to = '2' +newAccount.phoneNo;
     const text = `Code for verification is : ${randomCode}`;
     //nexmo.message.sendSms(from, to, text);
 }

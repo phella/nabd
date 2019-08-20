@@ -10,5 +10,5 @@ const patientSchema = new Schema({
 	profilePath: String
 });
 
-mongoose.model("patient", patientSchema);
+module.exports =  mongoose.model("patient", patientSchema);
 
