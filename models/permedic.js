@@ -12,11 +12,11 @@ const { Schema } = mongoose;
  */
 const permedicSchema = new Schema({
 	name: String,
-	bio: String,
 	rating: Number,
+	age:Number,
 	password: String,
-	gender: String,
-	number:String,
+	gender: Boolean,
+	phoneNo:String,
 	profilePath: String
 });
 
