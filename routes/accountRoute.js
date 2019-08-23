@@ -31,6 +31,8 @@ router.post('/register/patient', function (req, res) {
     if (isNaN(+phoneNo) || phoneNo.length !== 11 || phoneNo.substring(0, 2) !== "01" || phoneNo === null) {
         res.status(400).send({ "Error": "Wrong phone number format" });
         return;
+    } else if(numberPredefined(phoneNo)){
+        res.status(400).send({"Error":"Already Signed in"});
     }
 
     //check if something is missing in the payload
@@ -43,7 +45,7 @@ router.post('/register/patient', function (req, res) {
         age,
         gender,
         password,
-        phoneNo
+        _id:phoneNo
     });
     newAccount.save(function (err) {
         if (err) {
@@ -264,23 +266,24 @@ function activateAccount(newAccount,res) {
     thisMoment.setMinutes(thisMoment.getMinutes() + 5); // adding 5mins for date to expire
     let newCode = new code({
         code: randomCode,
-        phoneNo:newAccount.phoneNo,
+        phoneNo:newAccount._id,
         expirationDate: thisMoment
     })
     newCode.save(function (err) {
         if (err) {
-            res.status(409).send(err);
+          return res.status(409).send(err);
         }
     })
+    // should be in set timeout
     // deleting any expirated code
     code.deleteMany({ expirationDate: { $lt: Date.now() } }, function (err) {
         if (err) {
-            res.status(409).send(err);
+           return res.status(409).send(err);
         }
     })
     // creating new account but still not activated
     let newCredentials = new credentials({
-        phoneNo:newAccount.phoneNo,
+        phoneNo:newAccount._id,
         password: newAccount.password,
         isActivated: false
     })
@@ -289,11 +292,23 @@ function activateAccount(newAccount,res) {
             res.status(409).send(err);
         }
         else {
-            res.status(201).send("Created Successfully");
+            return res.status(201).send("Created Successfully");
         }
     })
     const from = 'Server';
-    const to = '2' +newAccount.phoneNo;
+    const to = '2' +newAccount._id;
     const text = `Code for verification is : ${randomCode}`;
     //nexmo.message.sendSms(from, to, text);
+}
+
+async function numberPredefined(phoneNo){
+    let found = false;
+    await patient.find({_id:phoneNo},(err,result)=>{
+        found = result;
+    });
+    if(found){
+        return true;
+    } else {
+        return false;
+    }
 }
