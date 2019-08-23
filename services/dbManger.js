@@ -9,13 +9,17 @@ async function addPatient(account){
     });
     return done;
 }
-async function fiendPatient(condition){
+async function fiendPatient(condition,...projectionArr){
 	let result;
-	await patient.findOne(condition,(err,res)=>{
+	projectionStr = "";
+	projectionArr.forEach(el=>{
+	projectionStr += el + " ";
+	});
+	await patient.findOne(condition,projectionStr,(err,res)=>{
 		result = res;
 	});
 	return result;
 }
 
-module.exports = {addPatient};
+module.exports = {addPatient,fiendPatient};
 
