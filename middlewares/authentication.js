@@ -3,7 +3,8 @@ const noAuthReuests = [
     '/register/patient',
     '/confirmation',
     '/resend_code',
-    '/login'
+    '/login',
+    'welcome/info'
 ];
 module.exports = function verifyToken(req,res,next){
     noAuthReuests.forEach(el =>{
