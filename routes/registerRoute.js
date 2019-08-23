@@ -18,7 +18,7 @@ client.get = util.promisify(client.get);
 
  let patient = require('../models/patient');
 
- router.post('/register/patient', function (req, res) {
+ router.post('/register/user', function (req, res) {
     const name = req.body.name;
     const phoneNo = req.body.phoneNo;
     const birthDate = req.body.birthDate;
