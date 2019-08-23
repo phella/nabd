@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const noAuthReuests = [
-    '/register/patient'
+    '/register/patient',
+    '/confirmation',
+    '/resend_code',
+    '/login'
 ];
 module.exports = function verifyToken(req,res,next){
     noAuthReuests.forEach(el =>{
