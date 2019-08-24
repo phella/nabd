@@ -17,7 +17,7 @@ client.get = util.promisify(client.get);
 
  let patient = require('../models/patient');
 
- router.post('/register/user', function (req, res) {
+ router.post('/register/user',async function (req, res) {
     const name = req.body.name;
     const phoneNo = req.body.phoneNo;
     const birthDate = req.body.birthDate;
@@ -25,10 +25,12 @@ client.get = util.promisify(client.get);
     const password = req.body.password;
 
     //check if the number is valid
-    if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 11 || phoneNo.substring(0, 2) !== "01") {
+    if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 12 || phoneNo.substring(0, 3) !== "201") {
        return res.status(400).json({ "Error": "Wrong phone number format" });
-    } else if(numberPredefined(phoneNo)){
-        res.status(409).json({"Error":"Account for phone number already exists"});
+    };
+    const numberPre = await numberPredefined(phoneNo);  
+    if(numberPre){
+        return res.status(409).json({"Error":"Account for phone number already exists"});
     }
 
     //check if something is missing in the payload
@@ -44,8 +46,8 @@ client.get = util.promisify(client.get);
         _id:phoneNo,
         randomCode
 	});
-	result = hashPasswords(newAccount);
-	const result = client.get(phoneNo);
+	hashPasswords(newAccount);
+    const result = await client.get(phoneNo);
 	if(result){
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
     }
@@ -57,7 +59,6 @@ client.get = util.promisify(client.get);
     const to = newAccount._id;
     const text = `Code for verification is : ${randomCode}`;
     //nexmo.message.sendSms(from, to, text);
-    console.log(randomCode);
 	return res.status(201).json("created successfully");
 });
 
@@ -75,7 +76,7 @@ router.post('/confirmation', async (req, res) => {
     const randomCode = req.body.randomCode;
 
     //check if the number is valid
-    if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 11 || phoneNo.substring(0, 3) !== "201") {
+    if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 12 || phoneNo.substring(0, 3) !== "201") {
         return res.status(400).send({ "Error": "Wrong phone number format" });
     }
     //check if code is valid
@@ -118,11 +119,12 @@ router.post('/resend_code', async (req, res) => {
 });
 
 async function numberPredefined(phoneNo){
-    let flag = true;
-    await patient.find({_id:phoneNo},(err,res)=>{
-        if(res){
-            flag = false;
+    let flag = false;
+    /*await patient.find({_id:phoneNo},(err,res)=>{
+        if(res.length !== 0){
+            flag = true;
+            console.log(res);
         }
-    });
-    return flag;
+    });*/
+    return false;
 }
