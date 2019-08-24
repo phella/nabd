@@ -1,22 +1,28 @@
 const jwt = require('jsonwebtoken');
 const noAuthReuests = [
-    '/register/patient',
-    '/confirmation',
-    '/resend_code',
-    '/login',
-    'welcome/info'
+    '/api/register/user',
+    '/api/confirmation',
+    '/api/resend_code',
+    '/api/login',
+    '/api/welcome/info'
 ];
 module.exports = function verifyToken(req,res,next){
+    console.log(req.url);
+    let flag = false;
     noAuthReuests.forEach(el =>{
         if(el === req.url){
-            next();
+        next();
+        flag = true;
         }
-    })
+    });
+    if(flag){
+        return;
+    }
     // get auth header value
     const token = req.headers['token'];
     //check if bearer is undefined
     if( token === undefined){
-        res.status(403).send({"Error":"unauthorized"});
+        return res.status(403).send({"Error":"unauthorized"});
     }
     else{
         jwt.verify(token,process.env.SERCETKEY,(err,authData)=>{
