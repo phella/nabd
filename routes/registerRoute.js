@@ -35,6 +35,7 @@ client.get = util.promisify(client.get);
     if (name === null || birthDate === null || gender === null || password === null) {
         return res.status(400).json({ "Error": "Payload is missing" });
     }
+    const randomCode = randomstring.generate(8);
     let newAccount = new patient({
         name,
         birthDate,
@@ -52,7 +53,6 @@ client.get = util.promisify(client.get);
     client.set(phoneNo,JSON.stringify(newAccount),"EX",60*60);
     
     // Send Random number
-    const randomCode = randomstring.generate(8);
     const from = 'Server';
     const to = newAccount._id;
     const text = `Code for verification is : ${randomCode}`;
