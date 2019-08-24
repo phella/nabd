@@ -76,7 +76,7 @@ router.post('/confirmation', async (req, res) => {
     const randomCode = req.body.randomCode;
 
     //check if the number is valid
-    if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 11 || phoneNo.substring(0, 2) !== "201") {
+    if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 11 || phoneNo.substring(0, 3) !== "201") {
         return res.status(400).send({ "Error": "Wrong phone number format" });
     }
     //check if code is valid
