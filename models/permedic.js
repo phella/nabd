@@ -20,5 +20,5 @@ const permedicSchema = new Schema({
 	profilePath: String
 });
 
-mongoose.model("permedic", permedicSchema);
+module.exports = mongoose.model("permedic", permedicSchema);
 

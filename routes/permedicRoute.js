@@ -14,7 +14,7 @@ const permedic = mongoose.model("permedic");
  * @this module:models~Permedic
  * 
  * @param rating the prefered rating for the prequested permedic
- * @param lastNumber last contacted permedic
+ * @param lastphoneNo last contacted permedic
  * 
  * @return {Permedic} the matched permedic
  */
@@ -32,12 +32,12 @@ module.exports = router.get("/requestPermedic/:rating", async (req,res) => {
 });
 
 
-router.get("/profile/permedic/:number" , async (req,res)=>{
-	if(req.params.number.length !== 11 || req.params.number.substring(0,2) !== "01") {
-		res.status(400).json({"Error":"Wrong phone number format"});
+router.get("/profile/permedic/:phoneNo" , async (req,res)=>{
+	if(req.params.phoneNo.length !== 11 || req.params.phoneNo.substring(0,2) !== "01") {
+		res.status(400).json({"Error":"Wrong phone phoneNo format"});
 	}
-	const profile = await permedic.findOne({number:req.params.number},"bio name number gender profilePath available")
-	.cache({"key":req.params.number})
+	const profile = await permedic.findOne({phoneNo:req.params.phoneNo},"bio name phoneNo gender profilePath available")
+	.cache({"key":req.params.phoneNo})
 	.exec();
 	if(!profile) {
 		res.status(404).json({"Error":"No such permedic"});

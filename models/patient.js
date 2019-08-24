@@ -2,13 +2,15 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const patientSchema = new Schema({
+	_id:String, // phone number
 	name: String,
 	age:Number,
 	password: String,
 	gender: Boolean,
-	phoneNo:String,
 	profilePath: String
+},{
+	versionKey:false
 });
 
-mongoose.model("patient", patientSchema);
+module.exports =  mongoose.model("patient", patientSchema);
 

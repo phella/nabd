@@ -8,7 +8,7 @@ require('./services/cache.service');
 
 
 app.use(require("./middlewares/authentication"));
-let account = require('./routes/account');
+
 
 
 Mongoose.connect(process.env.DATABASECONNECTION,{useNewUrlParser:true},
@@ -19,9 +19,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use("/api",require("./routes/"));
 
-///////////////////////////
-app.use('/account', account);
-///////////////////////////
 
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;
