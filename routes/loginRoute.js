@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require("./index");
 const jwt = require('jsonwebtoken');
 const dbManger =require("../services/dbManger");
 

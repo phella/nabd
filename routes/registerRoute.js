@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require("./index");
 const bcrypt =  require('bcrypt');
 const randomstring = require("randomstring");
 const dbManger = require("../services/dbManger");
@@ -117,3 +116,13 @@ router.post('/resend_code', async (req, res) => {
         return res.status(404).json({"Error":"Sign up first"});
     }
 });
+
+async function numberPredefined(phoneNo){
+    let flag = true;
+    await patient.find({_id:phoneNo},(err,res)=>{
+        if(res){
+            flag = false;
+        }
+    });
+    return flag;
+}
