@@ -5,14 +5,14 @@ const permedic = require('../models/permedic');
 // need to be in another file
 router.get('/welcome/info',async(req,res)=>{
 	let numberUsers;
-	let numberPermedics;
+	let numberParamedics;
 	await patient.countDocuments({},(err,count)=>{
 		numberUsers = count;
 	});	
 	await permedic.countDocuments({},(err,count)=>{
-		numberPermedics = count;
+		numberParamedics = count;
 	});
-	return res.status(200).json({numberUsers,numberPermedics,numberDoctors:0,numberAmbulance:0});
+	return res.status(200).json({numberUsers,numberParamedics,numberDoctors:0,numberAmbulance:0});
 });
 
 
