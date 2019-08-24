@@ -7,7 +7,7 @@ router.get('/welcome/info',async(req,res)=>{
 	let numberUsers;
 	let numberPermedics;
 	await patient.countDocuments({},(err,count)=>{
-		numberPatients = count;
+		numberUsers = count;
 	});	
 	await permedic.countDocuments({},(err,count)=>{
 		numberPermedics = count;
