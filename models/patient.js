@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const patientSchema = new Schema({
 	_id:String, // phone number
 	name: String,
-	age:Number,
+	birthDate:Date,
 	password: String,
 	gender: Boolean,
 	profilePath: String
