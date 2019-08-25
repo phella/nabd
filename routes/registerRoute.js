@@ -37,7 +37,7 @@ client.get = util.promisify(client.get);
     if (name === null || birthDate === null || gender === null || password === null) {
         return res.status(400).json({ "Error": "Payload is missing" });
     }
-    const randomCode = randomstring.generate(8);
+    const randomCode = randomstring.generate(4);
     let newAccount = new patient({
         name,
         birthDate,
@@ -105,7 +105,7 @@ router.post('/resend_code', async (req, res) => {
     const phoneNo = req.body.phoneNo;
     const result = await client.get(phoneNo);
     if(result){
-        const randomCode = randomstring.generate(8);
+        const randomCode = randomstring.generate(4);
         result.randomCode = randomCode;
         const from = 'Server';
         const to = `2 +${newAccount._id}`;
