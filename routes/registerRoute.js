@@ -1,6 +1,5 @@
 const router = require("./index");
 const bcrypt =  require('bcrypt');
-const randomstring = require("randomstring");
 const dbManger = require("../services/dbManger");
 const redis = require('redis');
 const redisUrl = "redis://127.0.0.1:6379";
@@ -34,18 +33,19 @@ client.get = util.promisify(client.get);
     }
 
     //check if something is missing in the payload
-    if (name === null || birthDate === null || gender === null || password === null) {
+    if (!name || !birthDate || !gender  || !password ) {
         return res.status(400).json({ "Error": "Payload is missing" });
     }
-    const randomCode = randomstring.generate(4);
-    let newAccount = new patient({
+    const randomCode =Math.random().toString().substring(2,6);
+    console.log(randomCode);
+    let newAccount = {
         name,
         birthDate,
         gender,
         password,
         _id:phoneNo,
         randomCode
-	});
+    };
 	hashPasswords(newAccount);
     const result = await client.get(phoneNo);
 	if(result){
@@ -58,7 +58,6 @@ client.get = util.promisify(client.get);
     const from = 'Server';
     const to = newAccount._id;
     const text = `Code for verification is : ${randomCode}`;
-    console.log(randomCode);
     //nexmo.message.sendSms(from, to, text);
 	return res.status(201).json("created successfully");
 });
@@ -84,13 +83,14 @@ router.post('/confirmation', async (req, res) => {
     if (!randomCode) {
         return res.status(400).send({ "Error": "Wrong code format" });
     }
-    const result = Json.parse(client.get(phoneNo));
+    const result = JSON.parse(await client.get(phoneNo));
     if(result.randomCode === randomCode) {
         delete result.randomCode;
+        const account = new patient(result);
         client.del(phoneNo);
         // More logic to be added 
         if(result.hasOwnProperty('_id')){
-            if(!dbManger.addPatient(result)){
+            if(!dbManger.addPatient(account)){
                 return res.status(202).json({"Error":"Try again later"})
             }
         }
@@ -105,7 +105,7 @@ router.post('/resend_code', async (req, res) => {
     const phoneNo = req.body.phoneNo;
     const result = await client.get(phoneNo);
     if(result){
-        const randomCode = randomstring.generate(4);
+        const randomCode = Math.random().toString().substring(2,6);
         result.randomCode = randomCode;
         const from = 'Server';
         const to = `2 +${newAccount._id}`;
