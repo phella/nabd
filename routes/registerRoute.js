@@ -58,6 +58,7 @@ client.get = util.promisify(client.get);
     const from = 'Server';
     const to = newAccount._id;
     const text = `Code for verification is : ${randomCode}`;
+    console.log(randomCode);
     //nexmo.message.sendSms(from, to, text);
 	return res.status(201).json("created successfully");
 });
