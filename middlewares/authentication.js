@@ -7,7 +7,6 @@ const noAuthReuests = [
     '/api/welcome/info'
 ];
 module.exports = function verifyToken(req,res,next){
-    console.log(req.url);
     let flag = false;
     noAuthReuests.forEach(el =>{
         if(el === req.url){
