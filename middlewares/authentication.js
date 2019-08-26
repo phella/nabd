@@ -3,7 +3,7 @@ const noAuthReuests = [
     '/api/register/user',
     '/api/confirmation',
     '/api/resend_code',
-    '/api/login',
+    '/api/login/user',
     '/api/welcome/info'
 ];
 module.exports = function verifyToken(req,res,next){

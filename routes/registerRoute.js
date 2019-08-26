@@ -48,7 +48,6 @@ bcrypt.hash = util.promisify(bcrypt.hash);
         randomCode
     };
     newAccount.password = await hashPasswords(newAccount);
-    console.log(newAccount);
     const result = await client.get(phoneNo);
 	if(result){
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
@@ -123,11 +122,10 @@ router.post('/resend_code', async (req, res) => {
 
 async function numberPredefined(phoneNo){
     let flag = false;
-    /*await patient.find({_id:phoneNo},(err,res)=>{
+    await patient.find({_id:phoneNo},(err,res)=>{
         if(res.length !== 0){
             flag = true;
-            console.log(res);
         }
-    });*/
-    return false;
+    });
+    return flag;
 }
