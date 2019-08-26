@@ -9,7 +9,7 @@ async function addPatient(account){
     });
     return done;
 }
-async function fiendPatient(condition,...projectionArr){
+async function findPatient(condition,...projectionArr){
 	let result;
 	projectionStr = "";
 	projectionArr.forEach(el=>{
@@ -21,5 +21,5 @@ async function fiendPatient(condition,...projectionArr){
 	return result;
 }
 
-module.exports = {addPatient,fiendPatient};
+module.exports = {addPatient,findPatient};
 

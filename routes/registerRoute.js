@@ -6,6 +6,7 @@ const redisUrl = "redis://127.0.0.1:6379";
 const util = require("util");
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
+bcrypt.hash = util.promisify(bcrypt.hash);
 // to send SMS
  const Nexmo = require('nexmo');
 
@@ -46,7 +47,8 @@ client.get = util.promisify(client.get);
         _id:phoneNo,
         randomCode
     };
-	hashPasswords(newAccount);
+    newAccount.password = await hashPasswords(newAccount);
+    console.log(newAccount);
     const result = await client.get(phoneNo);
 	if(result){
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
@@ -64,10 +66,10 @@ client.get = util.promisify(client.get);
 
 async function hashPasswords(newAccount) {
     //hashing password before storing in db
+    let hashed;
     const saltRounds = 10;
-    await bcrypt.hash(newAccount.password, saltRounds, function (err, hash) {
-        newAccount.password = hash;
-	});
+    hashed = await bcrypt.hash(newAccount.password, saltRounds);
+    return hashed;
 }
 
 
