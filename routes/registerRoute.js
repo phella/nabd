@@ -16,8 +16,9 @@ bcrypt.hash = util.promisify(bcrypt.hash);
  });
 
  let patient = require('../models/patient');
+ let paramedic =require('../models/paramedic');
 
- router.post('/register/user',async function (req, res) {
+ async function register(req,res,type){
     const name = req.body.name;
     const phoneNo = req.body.phoneNo;
     const birthDate = req.body.birthDate;
@@ -53,7 +54,7 @@ bcrypt.hash = util.promisify(bcrypt.hash);
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
     }
     // Save info in redis
-    client.set(phoneNo,JSON.stringify(newAccount),"EX",60*60);
+    client.hset(phoneNo,JSON.stringify(newAccount),"EX",60*60);
     
     // Send Random number
     const from = 'Server';
@@ -61,7 +62,7 @@ bcrypt.hash = util.promisify(bcrypt.hash);
     const text = `Code for verification is : ${randomCode}`;
     //nexmo.message.sendSms(from, to, text);
 	return res.status(201).json("created successfully");
-});
+}
 
 async function hashPasswords(newAccount) {
     //hashing password before storing in db
@@ -87,7 +88,14 @@ router.post('/confirmation', async (req, res) => {
     const result = JSON.parse(await client.get(phoneNo));
     if(result.randomCode === randomCode) {
         delete result.randomCode;
-        const account = new patient(result);
+        let account;
+        if(!result.rating){
+            account = new patient(result);
+        } else if(!resultspecialization){
+            account = new paramedic(result);
+        } else {
+            // doctor
+        }
         client.del(phoneNo);
         // More logic to be added 
         if(result.hasOwnProperty('_id')){
@@ -102,7 +110,7 @@ router.post('/confirmation', async (req, res) => {
 });
 
 
-router.post('/resend_code', async (req, res) => {
+router.put('/resend_code', async (req, res) => {
     const phoneNo = req.body.phoneNo;
     const result = await client.get(phoneNo);
     if(result){
@@ -129,3 +137,23 @@ async function numberPredefined(phoneNo){
     });
     return flag;
 }
+
+router.get('/welcome/info',async(req,res)=>{
+	let numberUsers;
+	let numberParamedics = 0;
+	await patient.countDocuments({},(err,count)=>{
+		numberUsers = count;
+		if(err){
+			console.log(err);
+		}
+	});	
+	await permedic.countDocuments({},(err,count)=>{
+		numberParamedics = count;
+		if(err){
+			console.log(err);
+		}
+	});
+	return res.status(200).json({numberUsers,numberParamedics,numberDoctors:0,numberAmbulance:0});
+});
+
+module.exports = {register};
