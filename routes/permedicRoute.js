@@ -19,7 +19,6 @@ const permedic = mongoose.model("permedic");
  * @return {Permedic} the matched permedic
  */
 module.exports = router.get("/requestPermedic/:rating", async (req,res) => {
-	let permedics = [];
 	if(req.params.rating < 0 || req.params.rating > 100){
 		return res.status(400).json({"Error":"Rating out of range"});
 	}	
