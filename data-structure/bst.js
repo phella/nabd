@@ -11,19 +11,17 @@ class BinarySearchTree {
         this.root = null;
 	}
 
-	insertPermedic(data,left=null,right=null){
-		let checkRedis = setTimeout(async()=>{
+	async insertPermedic(data,left=null,right=null){
 			available =	await client.get("available");
-			if(available == true){
+			if(available ){
 				this.root = await client.get("root");
-				this.root = JSON.parse(root);
-				clearTimeout(checkRedis);
-				this.PrivateinsertPermedic(data,left,right);
+				this.root = JSON.parse(this.root);
+				return this.PrivateinsertPermedic(data,left,right);
 			}
-		},50);
 	}
 
     PrivateinsertPermedic(data , left = null,right = null ) {
+		
 		client.set("available","false");
 		let node = {
             data : [data],
