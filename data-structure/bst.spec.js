@@ -1,10 +1,15 @@
 const chai = require('chai');
 let should = require('chai').should();
+const redis = require('redis');
+const redisUrl = "redis://127.0.0.1:6379";
+const client = redis.createClient(redisUrl);
 const expect = chai.expect;
 let bss = require("./bst");
 const bst =  new bss();
-const bst2 = new bss();
+
+
 describe("test binary search tree",()=>{
+	client.flushall();
 	it("constructor and insertion",async()=>{
 		expect(bst.root).to.equal(null);
 		const first = {rating:20,phoneNo:"0120"};
@@ -20,7 +25,7 @@ describe("test binary search tree",()=>{
 		expect(bst.root.data[1]).to.eql(second);
 		expect(bst.root.left).to.equal(null);
 		expect(bst.root.right).to.equal(null);
-		expect(bst.insertPermedic(third)).to.equal(false);
+		expect(await bst.insertPermedic(third)).to.equal(false);
 		await bst.insertPermedic(forth);
 		await bst.insertPermedic(fifth);
 		await bst.insertPermedic(sixth);
@@ -30,19 +35,21 @@ describe("test binary search tree",()=>{
 		expect(bst.root.right.data[0].rating).to.equal(30);
 		expect(bst.root.right.right.data[0].rating).to.equal(40);
 	});
-	it("binary search tree deletion",()=>{
-		expect(bst2.getPermedic(20)).to.equal(false);
-		bst.getPermedic(20);
+	it("binary search tree deletion",async ()=>{
+		await bst.getPermedic(20);
 		should.not.exist(bst.root.data[1]);
 		expect(bst.root.data[0].phoneNo).to.equal("011");
-		bst.getPermedic(20);
+		await bst.getPermedic(20);
 		expect(bst.root.data[0].phoneNo).to.equal("01");
-		expect(bst.getPermedic(5).phoneNo).to.equal("012");
+		let res = await bst.getPermedic(5);
+		expect(res.phoneNo).to.equal("012");
 		expect(bst.root.left).to.equal(null);
-		bst.getPermedic(30);
+		await bst.getPermedic(30);
 		expect(bst.root.right.data[0].phoneNo).to.equal("00");
-		expect(bst.getPermedic(10).phoneNo).to.equal("01");
-		expect(bst.getPermedic(10).phoneNo).to.equal("00");
+		res = await bst.getPermedic(10);
+		expect(res.phoneNo).to.equal("01");
+		res = await bst.getPermedic(10);
+		expect(res.phoneNo).to.equal("00");
 		expect(bst.root).to.equal(null);
 	});
 })

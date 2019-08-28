@@ -6,6 +6,7 @@ const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
 client.set("available","true");
 let available ; 
+
 class BinarySearchTree {
     constructor(){
         this.root = null;
@@ -33,6 +34,10 @@ class BinarySearchTree {
 			client.set("root",JSON.stringify(this.root));
 			client.set("available","true");
 			return true;
+		}
+		// Check if phoneNo already exists
+		if(!this.printTree(this.root,data.phoneNo)){
+			return false;
 		}
 		let lastNode = this.root;
 		let currentNode;
@@ -124,20 +129,16 @@ class BinarySearchTree {
         }
 	}
 	
-	getPermedic(rating){
-		let promise = new promise(function(resolve,reject){
-		let checkRedis2 = setTimeout(async()=>{
+	async getPermedic(rating){
 			available =	await client.get("available");
-			if(available == true){
+			if(available){
 				this.root = await client.get("root");
-				this.root = JSON.parse(root);
-				clearTimeout(checkRedis2);
-				resolve(this.PrivategetPermedic(rating));
+				this.root = JSON.parse(this.root);
+				return this.PrivategetPermedic(rating);
+				} else {
+					return false;
 				}
-			},50);
-		});
-		return promise
-	}
+			}
 
     PrivategetPermedic(rating){
 		client.set("available","false");
@@ -211,14 +212,20 @@ class BinarySearchTree {
 		client.set("available","true");
         return close;
 	}
-	printTree(node){
-		console.log(node.data[0].phoneNo);
+	printTree(node,phoneNo){
+		let flag0=true,flag1=true,flag2=true;
+		node.data.forEach(element => {
+			if(element.phoneNo === phoneNo){
+				flag0 = false;
+			}
+		});
 		if(node.left){
-			this.printTree(node.left);
+			flag1 = this.printTree(node.left,phoneNo);
 		} 
 		if(node.right) {
-			this.printTree(node.right);
+			flag2 = this.printTree(node.right,phoneNo);
 		}
+		return flag0 && flag1 && flag2;
 	}
 }
 
