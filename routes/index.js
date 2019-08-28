@@ -1,7 +1,8 @@
 const express = require ("express");
 const router = express.Router();
 module.exports = router;
-require("./permedicRoute");
-require("./patientRoute");
-require("./registerRoute");
+require("./paramedicRoute");
+require("./Register/patientRoute");
+require("./Register/paramedicRoute");
+require("./Register/registerRoute");
 require("./loginRoute");
