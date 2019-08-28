@@ -1,4 +1,5 @@
- const chai = require('chai');
+process.env.NODE_ENV = 'test'; 
+const chai = require('chai');
  const expect = chai.expect;
  const sinon = require('sinon');
  const sinonChai = require('sinon-chai');
@@ -13,7 +14,7 @@
 
  describe("Register Route ", ()=> { 
 	afterEach(()=>{
- 		sandbox.restore();
+ 		//sandbox.restore();
  		app = rewire("../index");
  	});
  		it("should return wrong phone format", ()=>{

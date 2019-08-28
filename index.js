@@ -9,11 +9,16 @@ require('./services/cache.service');
 
 app.use(require("./middlewares/authentication"));
 
-
-
-Mongoose.connect(process.env.DATABASECONNECTION,{useNewUrlParser:true},
-	console.log("Connected to database")
-);
+if (process.env.NODE_ENV==='test'){
+	Mongoose.connect(process.env.DATABASECONNECTION_TEST,{useNewUrlParser:true},
+		console.log("Connected to database for unit testing!")
+	);
+}
+else{
+	Mongoose.connect(process.env.DATABASECONNECTION_DEV,{useNewUrlParser:true},
+		console.log("Connected to database for Dev!")
+	);
+}
 app.use((req,res,next)=>{
 	res.header('Access-Control-Allow-Origin','*');
 	res.header('Access-Control-Allow-Headers','*');
