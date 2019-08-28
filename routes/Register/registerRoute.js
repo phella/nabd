@@ -1,6 +1,6 @@
-const router = require("./index");
+const router = require("../index");
 const bcrypt =  require('bcrypt');
-const dbManger = require("../services/dbManger");
+const dbManger = require("../../services/dbManger");
 const redis = require('redis');
 const redisUrl = "redis://127.0.0.1:6379";
 const util = require("util");
@@ -10,13 +10,13 @@ bcrypt.hash = util.promisify(bcrypt.hash);
 // to send SMS
  const Nexmo = require('nexmo');
 
- const nexmo = new Nexmo({
+ /*const nexmo = new Nexmo({
    apiKey: process.env.APIKEY,
    apiSecret: process.env.APISECRET,
  });
-
- let patient = require('../models/patient');
- let paramedic =require('../models/paramedic');
+*/
+ let patient = require('../../models/patient');
+ let paramedic =require('../../models/paramedic');
 
  async function register(req,res,type){
     const name = req.body.name;
@@ -91,7 +91,7 @@ router.post('/confirmation', async (req, res) => {
         let account;
         if(!result.rating){
             account = new patient(result);
-        } else if(!resultspecialization){
+        } else if(!result.specialization){
             account = new paramedic(result);
         } else {
             // doctor
