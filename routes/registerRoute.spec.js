@@ -1,4 +1,5 @@
- const chai = require('chai');
+process.env.NODE_ENV = 'test'; 
+const chai = require('chai');
  const expect = chai.expect;
 // const sinon = require('sinon');
 // const sinonChai = require('sinon-chai');
@@ -11,13 +12,13 @@
 // const {populatePermedics} = require("../services/seed.service");
 
 
- chai.use(chaiHttp);
+chai.use(chaiHttp);
 
  let app = rewire("../index");
  let Patient = require('../models/patient');
- describe("Register Toute ", ()=> { 
+ describe("Register Route ", ()=> { 
 	afterEach(()=>{
- 		sandbox.restore();
+ 		//sandbox.restore();
  		app = rewire("../index");
  	});
  	context("Sign up ", ()=>{
