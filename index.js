@@ -2,6 +2,9 @@ const Mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http); // socket.io instance initialization
+
 const chalk = require("chalk");
 require('dotenv').config();
 require('./services/cache.service');
@@ -33,6 +36,10 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use("/api",require("./routes/"));
 
+
+io.on('connection', function(socket){
+	console.log('A new client connected');
+});
 
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;

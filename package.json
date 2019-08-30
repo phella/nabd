@@ -18,7 +18,8 @@
     "passport-local": "^1.0.0",
     "randomstring": "^1.1.5",
     "redis": "^2.8.0",
-    "sandbox": "^0.8.6"
+    "sandbox": "^0.8.6",
+    "socket.io": "^2.2.0"
   },
   "scripts": {
     "test": " node -e \"require('./db').initDatabase()\" && cross-env NODE_ENV=development mocha './**/*.spec.js' --exit  && node -e \"require('./db').cleanDatabase()\" ",

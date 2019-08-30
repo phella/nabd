@@ -147,7 +147,7 @@ router.get('/welcome/info',async(req,res)=>{
 			console.log(err);
 		}
 	});	
-	await permedic.countDocuments({},(err,count)=>{
+	await paramedic.countDocuments({},(err,count)=>{
 		numberParamedics = count;
 		if(err){
 			console.log(err);
