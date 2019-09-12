@@ -39,7 +39,6 @@ bcrypt.hash = util.promisify(bcrypt.hash);
         return res.status(400).json({ "Error": "Payload is missing" });
     }
     const randomCode =Math.random().toString().substring(2,6);
-    console.log(randomCode);
     let newAccount = {
         name,
         birthDate,
@@ -49,6 +48,7 @@ bcrypt.hash = util.promisify(bcrypt.hash);
         randomCode
     };
     newAccount.password = await hashPasswords(newAccount);
+    console.log(newAccount)
     const result = await client.get(phoneNo);
 	if(result){
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
@@ -120,7 +120,6 @@ router.put('/resend_code', async (req, res) => {
         const to = `2 +${newAccount._id}`;
         const text = `Code for verification is : ${randomCode}`;
         //nexmo.message.sendSms(from, to, text);
-        console.log(randomCode);
         client.set(phoneNo,result,"EX",60*60);
         return res.status(201).json("New confirmation code sent");
     } else {

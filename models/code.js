@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require('mongoose-unique-validator');
 
-// code Schema
+// code Schema for account activation 
 const codeSchema = mongoose.Schema({
     code : {
         type: String,
