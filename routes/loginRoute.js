@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 let tokens = require('../models/token');
 
 async function login(req, res , find) {
-	const phoneNo = req.body.phoneNo;
+    const phoneNo = req.body.phoneNo;
 	const password = req.body.password;
 	if (!phoneNo || !password) {
 		return res.status(400).send({ "Error": "Payload is missing" });

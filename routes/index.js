@@ -7,3 +7,4 @@ require("./Register/paramedicRoute");
 require("./Register/registerRoute");
 require("./loginRoute");
 require("./logoutRoute");
+require("./incident");
