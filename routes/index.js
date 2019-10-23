@@ -8,3 +8,4 @@ require("./Register/registerRoute");
 require("./loginRoute");
 require("./logoutRoute");
 require("./incident");
+require("./media");

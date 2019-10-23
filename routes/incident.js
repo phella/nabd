@@ -39,7 +39,20 @@ router.post('/incident',async function (req, res) {
 
 
 router.get('/incident/:incidentId',async function (req, res) {
-    const incid = await incidents.findOne({_id:req.params.incidentId});
+    let incid;
+    if(!req.params.incidentId)
+    {
+        incid = await incidents.find({}).sort({date:-1}).limit(20)
+    }
+    else{
+        //incid = await incidents.find({}).sort({date:-1}).limit(1)
+        
+        // get all element 
+        incid = await incidents.find({}).sort({date:-1});
+        //getting 20 element starting from a certain id
+        //incid 
+    }
+         
     if(!incid) {
 		res.status(404).json({"Error":"No such incident"});
 	} else {
