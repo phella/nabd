@@ -36,8 +36,8 @@ router.post('/media',upload.single("file"),function (req, res) {
     res.status(200).send({"id":req.file.filename});
 });
 
-router.get('/media',async function(req,res){
-  const filename = req.body.id;
+router.get('/media',function(req,res){
+  const id = req.body.id;
 
   //const out = get_file(id)
   //console.log(out)
