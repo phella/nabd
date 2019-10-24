@@ -3,14 +3,24 @@ const dbManger = require("../services/dbManger");
 const bcrypt = require('bcrypt');
 let tokens = require('../models/token');
 
-async function login(req, res , find) {
-    const phoneNo = req.body.phoneNo;
+const redis  = require('redis');
+const redisUrl = "redis://127.0.0.1:6379";
+const client = redis.createClient(redisUrl);
+
+async function login(req, res ) {
+	const phoneNo = req.body.phoneNo;
 	const password = req.body.password;
 	if (!phoneNo || !password) {
 		return res.status(400).send({ "Error": "Payload is missing" });
 	}
 	// More logic to be added
-	const result = await find({ _id: phoneNo });
+	const result = await dbManger.findParamedic({ _id: phoneNo });
+	let type;
+	if(result){
+		type = "paramedic";
+	}else {
+		// const result = await dbManger.findDoctor({ _id: phoneNo });
+	}
 	if (!result) {
 		return res.status(401).send({ "Error": "No account found" });
 	}
@@ -45,6 +55,7 @@ async function login(req, res , find) {
 				if(err)
 					return res.status(400).send({"Error":"somethign went wrong, please make sure you do the procedures right"});
 			});
+			client.hset("ready",phoneNo,type);
 			// return token
 			return res.status(201).json({
 				token
