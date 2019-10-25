@@ -55,19 +55,38 @@ router.get('/incident/',async function (req, res) {
 
         index_of_id = incid.findIndex(x => x._id == id)
         if(index_of_id==-1)
-            incid = []
+        {
+            res.status(404).json({"Error":"No such incident"});
+            return 
+        }
+            
         else{
             //getting 20 element starting from a certain id
             index_of_id++;
-
             incid = incid.slice(index_of_id,index_of_id+20)
         }
-
     }
-         
-    if(!incid) {
-		res.status(404).json({"Error":"No such incident"});
-	} else {
-		res.status(200).json(incid);
-	}
+    res.status(200).json(incid);
+});
+
+
+router.delete('/incident/',async function (req, res) {
+    id = req.query.incidentId
+
+    if(id==undefined)
+    {
+        res.status(404).json({"Error":"Id is Required"});
+    }
+    else{
+        // get all element 
+        await incidents.deleteOne({_id:id},function(err){
+           
+            if(err)
+            {
+                res.status(401).json({"Error":"Something Went Wrong"});
+                return 
+            }
+        })
+        res.status(200).json("Deleted Sucessfully")
+    }
 });
