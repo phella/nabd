@@ -14,8 +14,18 @@ const redisUrl = "redis://127.0.0.1:6379";
 const client = redis.createClient(redisUrl);
 client.hget = util.promisify(client.hget);
 
-io.on('connection', function(socket){
+io.on('connection',async function(socket){
+	socket.phoneNo = socket.handshake.query.param;
+	const type = await client.hget("ready" , phoneNo) ;
+	if(type){
+		client.hdel("ready",phoneNo);
+		client.hset("available",phoneNo,type);
+	}
 	console.log('A new client connected' + socket.handshake.query.param);
+});
+
+io.on('disconnect',function(){
+	redis.hdel("available",io.socket.phoneNo);
 });
 
 function send(channels,message){
