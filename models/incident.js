@@ -3,11 +3,6 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 // code Schema for incident activation 
 const incidentSchema = mongoose.Schema({
-    incidentID :
-    {
-        type: String,
-        require : true
-    },
     userID : {
         type: String,
         require : true,
