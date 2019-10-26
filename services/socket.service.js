@@ -49,4 +49,11 @@ function answer(res){
 	client.hset("online","paramedic",JSON.stringify(paramedics));
 }
 
+// Client should subscribe on ambulance phoneNo
+io.on("liveLocation",(info)=>{
+	const longtiude = info.longtiude; 
+	const attiude = info.attiude;
+	io.emit(phoneNo,{longtiude , attiude});
+});
+
 module.exports = {send};
