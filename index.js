@@ -58,4 +58,4 @@ if(!module.parent) {
 }
 
 
-module.exports = app;
+module.exports = io;
