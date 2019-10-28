@@ -2,6 +2,7 @@ const Mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+require("./services/socket.service");
  // socket.io instance initialization
 
 const chalk = require("chalk");
@@ -38,10 +39,11 @@ app.use("/api",require("./routes/"));
 
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;
-if(!module.parent) {
+/*if(!module.parent) {
 	app.listen(port, () => {
 		console.log(`Listening on ${chalk.green(port)}`);
 	});
 }
+*/
 
 module.exports = app;
