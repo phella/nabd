@@ -2,9 +2,13 @@ const jwt = require('jsonwebtoken');
 const tokens = require('../models/token');
 const noAuthReuests = [
     '/api/register/user',
+    '/api/register/paramedic',
+    '/api/register/doctor',
     '/api/confirmation',
     '/api/resend_code',
     '/api/login/user',
+    '/api/login/paramedic',
+    '/api/login/doctor',
     '/api/welcome/info'
 ];
 module.exports = async function verifyToken(req,res,next){
