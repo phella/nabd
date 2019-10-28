@@ -13,13 +13,24 @@ async function login(req, res ) {
 	if (!phoneNo || !password) {
 		return res.status(400).send({ "Error": "Payload is missing" });
 	}
-	// More logic to be added
-	const result = await dbManger.findParamedic({ _id: phoneNo });
+	
+	let result = await dbManger.findParamedic({ _id: phoneNo },"name","password");
 	let type;
 	if(result){
-		type = "paramedic";
-	}else {
-		// const result = await dbManger.findDoctor({ _id: phoneNo });
+		type = "Paramedic";
+	}else{
+		result = await dbManger.findPatient({ _id: phoneNo },"name","password");
+		if(result)
+			type = "Patient";
+	}
+	if(!result){
+		result = await dbManger.findAmbulance({ _id: phoneNo },"name","password");
+		if(result)
+			type = "Ambulance";
+	}
+	if(!result){
+		result = await dbManger.findDoctor({ _id: phoneNo },"name","password");
+		type = "Doctor";
 	}
 	if (!result) {
 		return res.status(401).send({ "Error": "No account found" });
@@ -53,12 +64,14 @@ async function login(req, res ) {
 			var newToken = new tokens(userToken);
 			await newToken.save(function(err){
 				if(err)
-					return res.status(400).send({"Error":"somethign went wrong, please make sure you do the procedures right"});
+					return res.status(400).send({"Error":"somethiNG went wrong, please make sure you do the procedures right"});
 			});
-			client.hset("ready",phoneNo,type);
+			if(type)
+				client.hset("ready",phoneNo,type);
 			// return token
 			return res.status(201).json({
-				token
+				token,
+				"userName":result.name
 			});
 		}
 	})

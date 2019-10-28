@@ -1,7 +1,7 @@
 const router = require("../index");
 const {register} = require("./registerRoute");
-const {login} = require("../loginRoute");
-const {logout} = require("../logoutRoute");
+const {login} = require("../loginUtilities");
+const {logout} = require("../logoutUtilities");
 const dbManger = require("../../services/dbManger");
 router.post('/register/user',async function (req, res) {
 	return register(req,res);

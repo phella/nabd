@@ -5,18 +5,23 @@ const redis = require('redis');
 const redisUrl = "redis://127.0.0.1:6379";
 const util = require("util");
 const client = redis.createClient(redisUrl);
+client.hget = util.promisify(client.hget);
 client.get = util.promisify(client.get);
 bcrypt.hash = util.promisify(bcrypt.hash);
+
 // to send SMS
  const Nexmo = require('nexmo');
 
- /*const nexmo = new Nexmo({
+ const nexmo = new Nexmo({
    apiKey: process.env.APIKEY,
    apiSecret: process.env.APISECRET,
  });
-*/
- let patient = require('../../models/patient');
- let paramedic =require('../../models/paramedic');
+
+// Models
+const patient = require('../../models/patient');
+const paramedic = require('../../models/paramedic');
+const doctor = require('../../models/doctor'); 
+const ambulance = require('../../models/ambulance');
 
  async function register(req,res,type){
     const name = req.body.name;
@@ -24,6 +29,10 @@ bcrypt.hash = util.promisify(bcrypt.hash);
     const birthDate = req.body.birthDate;
     const gender = req.body.gender;
     const password = req.body.password;
+    // For paramedics and doctors
+    const rating  = req.body.rating;
+    // For doctors
+    const specialization = req.body.specialization;
 
     //check if the number is valid
     if (!phoneNo || isNaN(+phoneNo) || phoneNo.length !== 12 || phoneNo.substring(0, 3) !== "201") {
@@ -35,7 +44,7 @@ bcrypt.hash = util.promisify(bcrypt.hash);
     }
 
     //check if something is missing in the payload
-    if (!name || !birthDate || !gender  || !password ) {
+    if (!name || !birthDate || !password ) {
         return res.status(400).json({ "Error": "Payload is missing" });
     }
     const randomCode =Math.random().toString().substring(2,6);
@@ -45,22 +54,24 @@ bcrypt.hash = util.promisify(bcrypt.hash);
         gender,
         password,
         _id:phoneNo,
-        randomCode
+        randomCode,
+        rating,
+        specialization
     };
     newAccount.password = await hashPasswords(newAccount);
-    console.log(newAccount)
+    console.log(newAccount);
     const result = await client.get(phoneNo);
 	if(result){
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
     }
     // Save info in redis
-    client.hset(phoneNo,JSON.stringify(newAccount),"EX",60*60);
-    
+    client.hset(phoneNo,"confirmation",JSON.stringify(newAccount));
+
     // Send Random number
     const from = 'Server';
     const to = newAccount._id;
     const text = `Code for verification is : ${randomCode}`;
-    //nexmo.message.sendSms(from, to, text);
+    nexmo.message.sendSms(from, to, text);
 	return res.status(201).json("created successfully");
 }
 
@@ -85,24 +96,27 @@ router.post('/confirmation', async (req, res) => {
     if (!randomCode) {
         return res.status(400).send({ "Error": "Wrong code format" });
     }
-    const result = JSON.parse(await client.get(phoneNo));
+    const result = JSON.parse(await client.hget(phoneNo,"confirmation"));
+    console.log(result);
     if(result.randomCode === randomCode) {
         delete result.randomCode;
         let account;
         if(!result.rating){
             account = new patient(result);
+            dbManger.addPatient(account);
         } else if(!result.specialization){
-            account = new paramedic(result);
-        } else {
-            // doctor
-        }
-        client.del(phoneNo);
-        // More logic to be added 
-        if(result.hasOwnProperty('_id')){
-            if(!dbManger.addPatient(account)){
-                return res.status(202).json({"Error":"Try again later"})
+            if(result.rating){ 
+                account = new paramedic(result);
+                dbManger.addParamedic(account);
+            } else {
+                account = new ambulance(result);
+                dbManger.addParamedic(account);
             }
+        } else {
+            account = new doctor(result);
+            dbManger.addDoctor(account);
         }
+        client.hdel(phoneNo,"confirmation");
         return res.status(201).json("Account activated");
     } else {
         return res.status(404).json({"Error":"Not found"});
@@ -117,9 +131,9 @@ router.put('/resend_code', async (req, res) => {
         const randomCode = Math.random().toString().substring(2,6);
         result.randomCode = randomCode;
         const from = 'Server';
-        const to = `2 +${newAccount._id}`;
+        const to = newAccount._id;
         const text = `Code for verification is : ${randomCode}`;
-        //nexmo.message.sendSms(from, to, text);
+        nexmo.message.sendSms(from, to, text);
         client.set(phoneNo,result,"EX",60*60);
         return res.status(201).json("New confirmation code sent");
     } else {
@@ -128,13 +142,20 @@ router.put('/resend_code', async (req, res) => {
 });
 
 async function numberPredefined(phoneNo){
-    let flag = false;
-    await patient.find({_id:phoneNo},(err,res)=>{
-        if(res.length !== 0){
-            flag = true;
-        }
-    });
-    return flag;
+    let result = await dbManger.findParamedic({_id:phoneNo});
+    if(result){ 
+        return true;
+    }
+    result = await dbManger.findPatient({_id:phoneNo});
+    if(result)
+        return true;
+    result = await dbManger.findDoctor({_id:phoneNo});
+    if(result)
+        return true;
+    result = await dbManger.findAmbulance({_id:phoneNo});
+    if(result)
+        return true;
+    return false;
 }
 
 router.get('/welcome/info',async(req,res)=>{
