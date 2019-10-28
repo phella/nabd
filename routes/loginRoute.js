@@ -61,7 +61,8 @@ async function login(req, res ) {
 				client.hset("ready",phoneNo,type);
 			// return token
 			return res.status(201).json({
-				token
+				token,
+				"userName":result.name
 			});
 		}
 	})
