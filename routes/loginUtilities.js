@@ -13,15 +13,19 @@ async function login(req, res ) {
 	if (!phoneNo || !password) {
 		return res.status(400).send({ "Error": "Payload is missing" });
 	}
-	// More logic to be added
-	// add projection
+	
 	let result = await dbManger.findParamedic({ _id: phoneNo },"name","password");
 	let type;
 	if(result){
 		type = "paramedic";
 	}else {
 		result = await dbManger.findPatient({ _id: phoneNo },"name","password");
-		console.log(result);
+		if(result)
+			type = "patient";
+		else{
+			result = await dbManger.findDoctor({ _id: phoneNo },"name","password");
+			type = "doctor";
+		}
 	}
 	if (!result) {
 		return res.status(401).send({ "Error": "No account found" });
