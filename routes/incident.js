@@ -46,7 +46,10 @@ router.get('/incident/',async function (req, res) {
 
     if(id==undefined)
     {
-        incid = await incidents.find({}).sort({date:-1}).limit(20)
+        incid = await incidents.find({}).sort({date:-1}).limit(20);
+        if(!incid){
+            res.status(404).json({"Error":"No such incident"})
+        }
     }
     else{
         
