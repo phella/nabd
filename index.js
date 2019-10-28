@@ -12,17 +12,10 @@ let io = socketIO(server);
 const chalk = require("chalk");
 require('dotenv').config();
 require('./services/cache.service');
-
+require('./services/socket.service')(io);
 
 app.use(require("./middlewares/authentication"));
 
-io.on('connection', (socket) => {
-	socket.on('open chat', (data) => {
-	   const messages = controller.getLastMessages(data.myID,data.secondID);
-	   socket.emit('last messages',messages);
-	}); 
-	console.log('user connected');
-  });
 
 if (process.env.NODE_ENV==='test'){
 	Mongoose.connect(process.env.DATABASECONNECTION_TEST,{useNewUrlParser:true},
@@ -57,5 +50,4 @@ if(!module.parent) {
 	});
 }
 
-
-module.exports = io;
+module.exports = app;
