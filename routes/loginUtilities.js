@@ -17,15 +17,20 @@ async function login(req, res ) {
 	let result = await dbManger.findParamedic({ _id: phoneNo },"name","password");
 	let type;
 	if(result){
-		type = "paramedic";
-	}else {
+		type = "Paramedic";
+	}else{
 		result = await dbManger.findPatient({ _id: phoneNo },"name","password");
 		if(result)
-			type = "patient";
-		else{
-			result = await dbManger.findDoctor({ _id: phoneNo },"name","password");
-			type = "doctor";
-		}
+			type = "Patient";
+	}
+	if(!result){
+		result = await dbManger.findAmbulance({ _id: phoneNo },"name","password");
+		if(result)
+			type = "Ambulance";
+	}
+	if(!result){
+		result = await dbManger.findDoctor({ _id: phoneNo },"name","password");
+		type = "Doctor";
 	}
 	if (!result) {
 		return res.status(401).send({ "Error": "No account found" });
@@ -59,7 +64,7 @@ async function login(req, res ) {
 			var newToken = new tokens(userToken);
 			await newToken.save(function(err){
 				if(err)
-					return res.status(400).send({"Error":"somethign went wrong, please make sure you do the procedures right"});
+					return res.status(400).send({"Error":"somethiNG went wrong, please make sure you do the procedures right"});
 			});
 			if(type)
 				client.hset("ready",phoneNo,type);

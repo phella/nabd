@@ -5,6 +5,7 @@ require("./paramedicRoute");
 require("./Register/patientRoute");
 require("./Register/paramedicRoute");
 require("./Register/doctorRoute");
+require("./Register/ambulanceRoute");
 require("./Register/registerRoute");
 require("./loginUtilities");
 require("./logoutUtilities");

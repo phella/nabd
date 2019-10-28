@@ -4,9 +4,11 @@ const noAuthReuests = [
     '/api/register/user',
     '/api/register/paramedic',
     '/api/register/doctor',
+    '/api/register/ambulance', 
     '/api/confirmation',
     '/api/resend_code',
     '/api/login/user',
+    '/api/login/ambulance',
     '/api/login/paramedic',
     '/api/login/doctor',
     '/api/welcome/info'

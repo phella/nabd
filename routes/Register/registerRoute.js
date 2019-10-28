@@ -8,6 +8,7 @@ const client = redis.createClient(redisUrl);
 client.hget = util.promisify(client.hget);
 client.get = util.promisify(client.get);
 bcrypt.hash = util.promisify(bcrypt.hash);
+
 // to send SMS
  const Nexmo = require('nexmo');
 
@@ -16,9 +17,12 @@ bcrypt.hash = util.promisify(bcrypt.hash);
    apiSecret: process.env.APISECRET,
  });
 
+// Models
 const patient = require('../../models/patient');
-const paramedic =require('../../models/paramedic');
-const doctor =require('../../models/doctor'); 
+const paramedic = require('../../models/paramedic');
+const doctor = require('../../models/doctor'); 
+const ambulance = require('../../models/ambulance');
+
  async function register(req,res,type){
     const name = req.body.name;
     const phoneNo = req.body.phoneNo;
@@ -40,7 +44,7 @@ const doctor =require('../../models/doctor');
     }
 
     //check if something is missing in the payload
-    if (!name || !birthDate || !gender  || !password ) {
+    if (!name || !birthDate || !password ) {
         return res.status(400).json({ "Error": "Payload is missing" });
     }
     const randomCode =Math.random().toString().substring(2,6);
@@ -101,11 +105,16 @@ router.post('/confirmation', async (req, res) => {
             account = new patient(result);
             dbManger.addPatient(account);
         } else if(!result.specialization){
-            account = new paramedic(result);
-            dbManger.addParamedic(account);
+            if(result.rating){ 
+                account = new paramedic(result);
+                dbManger.addParamedic(account);
+            } else {
+                account = new ambulance(result);
+                dbManger.addParamedic(account);
+            }
         } else {
             account = new doctor(result);
-            dbManger.addParamedic(account);
+            dbManger.addDoctor(account);
         }
         client.hdel(phoneNo,"confirmation");
         return res.status(201).json("Account activated");
@@ -141,6 +150,9 @@ async function numberPredefined(phoneNo){
     if(result)
         return true;
     result = await dbManger.findDoctor({_id:phoneNo});
+    if(result)
+        return true;
+    result = await dbManger.findAmbulance({_id:phoneNo});
     if(result)
         return true;
     return false;
