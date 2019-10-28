@@ -14,12 +14,14 @@ async function login(req, res ) {
 		return res.status(400).send({ "Error": "Payload is missing" });
 	}
 	// More logic to be added
-	const result = await dbManger.findParamedic({ _id: phoneNo });
+	// add projection
+	let result = await dbManger.findParamedic({ _id: phoneNo },"name","password");
 	let type;
 	if(result){
 		type = "paramedic";
 	}else {
-		// const result = await dbManger.findDoctor({ _id: phoneNo });
+		result = await dbManger.findPatient({ _id: phoneNo },"name","password");
+		console.log(result);
 	}
 	if (!result) {
 		return res.status(401).send({ "Error": "No account found" });
@@ -55,7 +57,8 @@ async function login(req, res ) {
 				if(err)
 					return res.status(400).send({"Error":"somethign went wrong, please make sure you do the procedures right"});
 			});
-			client.hset("ready",phoneNo,type);
+			if(type)
+				client.hset("ready",phoneNo,type);
 			// return token
 			return res.status(201).json({
 				token
