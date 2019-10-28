@@ -5,6 +5,7 @@ const redis = require('redis');
 const redisUrl = "redis://127.0.0.1:6379";
 const util = require("util");
 const client = redis.createClient(redisUrl);
+client.hget = util.promisify(client.hget);
 client.get = util.promisify(client.get);
 bcrypt.hash = util.promisify(bcrypt.hash);
 // to send SMS
@@ -54,8 +55,8 @@ bcrypt.hash = util.promisify(bcrypt.hash);
 		return res.status(409).json({"Error":"Account is created and needs confirmation"});
     }
     // Save info in redis
-    client.hset(phoneNo,JSON.stringify(newAccount),"EX",60*60);
-    
+    client.hset(phoneNo,"confirmation",JSON.stringify(newAccount));
+
     // Send Random number
     const from = 'Server';
     const to = newAccount._id;
@@ -85,7 +86,8 @@ router.post('/confirmation', async (req, res) => {
     if (!randomCode) {
         return res.status(400).send({ "Error": "Wrong code format" });
     }
-    const result = JSON.parse(await client.get(phoneNo));
+    const result = JSON.parse(await client.hget(phoneNo,"confirmation"));
+    console.log(result);
     if(result.randomCode === randomCode) {
         delete result.randomCode;
         let account;
