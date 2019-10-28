@@ -16,7 +16,7 @@ const paramedicSchema = new Schema({
 	age:Number,
 	password: String,
 	gender: Boolean,
-	phoneNo:String,
+	_id:String,
 	profilePath: String
 });
 
