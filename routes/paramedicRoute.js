@@ -1,12 +1,9 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
-const util = require('util');
-const redis  = require('redis');
-const redisUrl = "redis://127.0.0.1:6379";
+
 const socket = require("../services/socket.service");
-const client = redis.createClient(redisUrl);
-client.hget = util.promisify(client.hget);
+
 // const binarySearchTree = require("../data-structure/bst");
 // bst  = new binarySearchTree();
 require("../models/paramedic");
@@ -30,10 +27,9 @@ module.exports = router.get("/requestParamedic", async (req,res) => {
 	if(!paramedics){
 		return res.status(400).json({Error:"No available paramedics"});
 	}
-	const selected = paramedics.splice(0,20);
-	client.hset("online","paramedics",JSON.stringify( paramedics));
-	socket.send(selected,req.body.id); 
-	return res.status(200).json("Requested Successfully");
+	const selected = paramedics.splice(0,1);
+	client.hset("online","paramedic",JSON.stringify(paramedics));
+	return res.status(200).json({helperNumber:selected._id});
 });
 
 
